@@ -1,8 +1,11 @@
 package estudio_tarea_5;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Alumno {
+public class Alumno implements Serializable {
+
+	private static final long serialVersionUID = 5809185336833191070L;
 
 	private int nia;
 	private String nombre;
