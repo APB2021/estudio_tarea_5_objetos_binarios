@@ -1,8 +1,11 @@
 package estudio_tarea_5;
 
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -51,17 +54,35 @@ public class GestorAlumnos {
 	}
 
 	public void guardaObjetoAlumno(Alumno alumno, File ficheroBinario) {
-	    boolean existeFichero = ficheroBinario.exists(); // Verificar si el fichero ya existe.
+		boolean existeFichero = ficheroBinario.exists(); // Verificar si el fichero ya existe.
 
-	    try (FileOutputStream fos = new FileOutputStream(ficheroBinario, true);
-	         ObjectOutputStream oos = existeFichero 
-	             ? new ObjectOutputStreamSinCabecera(fos) // Usar clase personalizada si el fichero existe
-	             : new ObjectOutputStream(fos)) { // Usar clase estándar si es un fichero nuevo
-	        oos.writeObject(alumno); // Escribir el objeto alumno en el fichero
-	    } catch (IOException e) {
-	        System.err.println("Error al guardar el objeto alumno: " + e.getMessage());
-	    }
+		try (FileOutputStream fos = new FileOutputStream(ficheroBinario, true);
+				ObjectOutputStream oos = existeFichero ? new ObjectOutputStreamSinCabecera(fos) // Usar clase
+																								// personalizada si el
+																								// fichero existe
+						: new ObjectOutputStream(fos)) { // Usar clase estándar si es un fichero nuevo
+			oos.writeObject(alumno); // Escribir el objeto alumno en el fichero
+		} catch (IOException e) {
+			System.err.println("Error al guardar el objeto alumno: " + e.getMessage());
+		}
 	}
 
-
+	public void leerFicheroBinario(File ficheroBinario) {
+		try (FileInputStream fis = new FileInputStream(ficheroBinario);
+				ObjectInputStream ois = new ObjectInputStream(fis);) {
+			while (true) {
+				try {
+					Alumno alumno = (Alumno) ois.readObject();
+					System.out.println(alumno);
+				} catch (EOFException e) {
+					break;
+				} catch (ClassNotFoundException e) {
+					System.err.println("Fichero no encontrado " + e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		} catch (IOException e) {
+			System.out.println("Fin del fichero");
+		}
+	}
 }
